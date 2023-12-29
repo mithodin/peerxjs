@@ -1,0 +1,37 @@
+{
+  "name": "peerxjs",
+  "version": "0.0.1",
+  "description": "A wrapper around peer.js that uses rxjs observables",
+  "type": "module",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mithodin/peerxjs.git"
+  },
+  "keywords": [
+    "peerjs",
+    "rxjs"
+  ],
+  "author": "Lucas L. Treffenstädt",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mithodin/peerxjs/issues"
+  },
+  "homepage": "https://github.com/mithodin/peerxjs#readme",
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1",
+    "vite": "^5.0.10",
+    "vitest": "^1.1.0"
+  },
+  "peerDependencies": {
+    "peerjs": "^1.5.2",
+    "rxjs": "^7.8.1"
+  }
+}
