@@ -12,7 +12,7 @@ const FORWARDED_PROPS = [
     'type',
     'dataChannel',
     'peerConnection',
-] as const;
+] satisfies Array<keyof DataConnection>;
 export type PeeRXJSDataConnection = Observable<unknown> &
     Observer<unknown> &
     Pick<DataConnection, (typeof FORWARDED_PROPS)[number]>;
@@ -36,7 +36,7 @@ export function dataConnection(
             complete: () => dataConnection.close(),
             error: (error) => void error, // ignore errors
         },
-        subject
+        subject.asObservable()
     ) as PeeRXJSDataConnection;
     FORWARDED_PROPS.forEach((prop) => {
         Object.defineProperty(connection, prop, {

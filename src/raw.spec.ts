@@ -105,7 +105,7 @@ describe('raw peerxjs', () => {
         MockPeerJs.instance?.emit('call', mockCall);
         await expect(shouldCall).resolves.toEqual({
             type: 'call',
-            connection: expect.anything(),
+            answer: expect.any(Function),
         });
     });
 
@@ -173,7 +173,7 @@ describe('raw peerxjs', () => {
         peerxjs.next(call('mock-peer-id', { metadata: 'my-label' }));
         await expect(shouldCall).resolves.toEqual({
             type: 'call',
-            connection: expect.anything(),
+            answer: expect.any(Function),
         });
     });
 

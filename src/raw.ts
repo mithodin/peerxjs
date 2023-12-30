@@ -1,13 +1,15 @@
 import { Observable, Observer, Subject } from 'rxjs';
-import { MediaConnection, Peer, PeerOptions } from 'peerjs';
+import { Peer, PeerOptions } from 'peerjs';
 import { PeeRXJSEvent, PeeRXJSEventType } from './events.js';
 import {
+    CallCommand,
     ConnectCommand,
     PeeRXJSCommand,
     PeeRXJSCommandType,
 } from './commands.js';
 import { combineObserverAndObservable } from './util.js';
 import { dataConnection } from './dataConnection.js';
+import { mediaConnection } from './mediaConnection.js';
 
 function getPeer(
     id: undefined | string | PeerOptions,
@@ -40,7 +42,14 @@ function setUpEventHandlers(peer: Peer, subject: Subject<PeeRXJSEvent>) {
         });
     });
     peer.on('call', (call) => {
-        subject.next({ type: PeeRXJSEventType.CALL, connection: call });
+        subject.next({
+            type: PeeRXJSEventType.CALL,
+            answer: (stream) => {
+                const connection = mediaConnection(call);
+                call.answer(stream);
+                return connection;
+            },
+        });
     });
     peer.on('disconnected', () => {
         subject.next({
@@ -76,12 +85,19 @@ function connectTo(
     });
 }
 
-function callPeer(peer: Peer, subject: Subject<PeeRXJSEvent>) {
+function callPeer(
+    peer: Peer,
+    command: CallCommand,
+    subject: Subject<PeeRXJSEvent>
+) {
     doWhenOpen(peer, () => {
-        const call = {} as unknown as MediaConnection;
         subject.next({
             type: PeeRXJSEventType.CALL,
-            connection: call,
+            answer: (stream) => {
+                return mediaConnection(
+                    peer.call(command.peerId, stream, command.options)
+                );
+            },
         });
     });
 }
@@ -103,7 +119,7 @@ export function register(
                         connectTo(peer, command, subject);
                         break;
                     case PeeRXJSCommandType.CALL:
-                        callPeer(peer, subject);
+                        callPeer(peer, command, subject);
                         break;
                 }
             },
@@ -113,6 +129,6 @@ export function register(
                 peer.destroy();
             },
         },
-        subject
+        subject.asObservable()
     );
 }
