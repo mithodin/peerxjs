@@ -1,4 +1,5 @@
-import { DataConnection, MediaConnection } from 'peerjs';
+import { MediaConnection } from 'peerjs';
+import { PeeRXJSDataConnection } from './dataConnection.js';
 
 export enum PeeRXJSEventType {
     OPEN = 'open',
@@ -16,7 +17,7 @@ export type OpenEvent = PeeRXJSEventBase<PeeRXJSEventType.OPEN> & {
 };
 
 export type ConnectionEvent = PeeRXJSEventBase<PeeRXJSEventType.CONNECTION> & {
-    connection: DataConnection;
+    connection: PeeRXJSDataConnection;
 };
 
 export type CallEvent = PeeRXJSEventBase<PeeRXJSEventType.CALL> & {

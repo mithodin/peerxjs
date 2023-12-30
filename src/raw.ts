@@ -6,6 +6,8 @@ import {
     PeeRXJSCommand,
     PeeRXJSCommandType,
 } from './commands.js';
+import { combineObserverAndObservable } from './util.js';
+import { dataConnection } from './dataConnection.js';
 
 function getPeer(
     id: undefined | string | PeerOptions,
@@ -32,7 +34,10 @@ function setUpEventHandlers(peer: Peer, subject: Subject<PeeRXJSEvent>) {
         subject.next({ type: PeeRXJSEventType.OPEN, peerId });
     });
     peer.on('connection', (connection) => {
-        subject.next({ type: PeeRXJSEventType.CONNECTION, connection });
+        subject.next({
+            type: PeeRXJSEventType.CONNECTION,
+            connection: dataConnection(connection),
+        });
     });
     peer.on('call', (call) => {
         subject.next({ type: PeeRXJSEventType.CALL, connection: call });
@@ -66,7 +71,7 @@ function connectTo(
         const connection = peer.connect(command.peerId, command.options);
         subject.next({
             type: PeeRXJSEventType.CONNECTION,
-            connection,
+            connection: dataConnection(connection),
         });
     });
 }
@@ -90,28 +95,24 @@ export function register(
     const subject = new Subject<PeeRXJSEvent>();
     const peer = getPeer(id, config);
     setUpEventHandlers(peer, subject);
-    return {
-        lift: subject.lift.bind(subject),
-        operator: subject.operator,
-        source: subject.source,
-        forEach: subject.forEach.bind(subject),
-        pipe: subject.pipe.bind(subject),
-        toPromise: subject.toPromise.bind(subject),
-        subscribe: subject.subscribe.bind(subject),
-        next: (command) => {
-            switch (command.type) {
-                case PeeRXJSCommandType.CONNECT:
-                    connectTo(peer, command, subject);
-                    break;
-                case PeeRXJSCommandType.CALL:
-                    callPeer(peer, subject);
-                    break;
-            }
+    return combineObserverAndObservable<PeeRXJSCommand, PeeRXJSEvent>(
+        {
+            next: (command) => {
+                switch (command.type) {
+                    case PeeRXJSCommandType.CONNECT:
+                        connectTo(peer, command, subject);
+                        break;
+                    case PeeRXJSCommandType.CALL:
+                        callPeer(peer, subject);
+                        break;
+                }
+            },
+            error: (error) => void error, // ignore errors
+            complete: () => {
+                peer.disconnect();
+                peer.destroy();
+            },
         },
-        error: (error) => void error, // ignore errors
-        complete: () => {
-            peer.disconnect();
-            peer.destroy();
-        },
-    };
+        subject
+    );
 }
