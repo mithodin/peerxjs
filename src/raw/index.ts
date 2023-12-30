@@ -7,9 +7,14 @@ import {
     PeeRXJSCommand,
     PeeRXJSCommandType,
 } from './commands.js';
-import { combineObserverAndObservable } from './util.js';
+import { combineObserverAndObservable } from '../util.js';
 import { dataConnection } from './dataConnection.js';
 import { mediaConnection } from './mediaConnection.js';
+
+export * from './commands.js';
+export * from './events.js';
+export type { PeeRXJSDataConnection } from './dataConnection.js';
+export type { PeeRXJSMediaConnection } from './mediaConnection.js';
 
 function getPeer(
     id: undefined | string | PeerOptions,

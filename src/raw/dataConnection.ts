@@ -1,6 +1,6 @@
 import { DataConnection } from 'peerjs';
 import { Observable, Observer, Subject } from 'rxjs';
-import { combineObserverAndObservable } from './util.js';
+import { combineObserverAndObservable } from '../util.js';
 
 const FORWARDED_PROPS = [
     'label',

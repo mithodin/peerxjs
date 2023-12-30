@@ -1,6 +1,6 @@
 import EventEmitter from 'node:events';
 import { beforeEach, describe, expect, it, Mocked, vi } from 'vitest';
-import { register } from './raw.js';
+import { register } from './index.js';
 import { filter, firstValueFrom, lastValueFrom, materialize } from 'rxjs';
 import type { Peer } from 'peerjs';
 import { DisconnectedEvent, PeeRXJSEventType } from './events.js';
