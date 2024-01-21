@@ -4,7 +4,8 @@
   "description": "A wrapper around peer.js that uses rxjs observables",
   "type": "module",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -28,10 +29,38 @@
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.1.1",
     "vite": "^5.0.10",
+    "vite-plugin-dts": "^3.7.1",
+    "vite-plugin-externalize-deps": "^0.8.0",
     "vitest": "^1.1.0"
   },
   "peerDependencies": {
     "peerjs": "^1.5.2",
     "rxjs": "^7.8.1"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "node": "./dist/index.cjs",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "browser": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./raw": {
+      "types": "./dist/src/raw/index.d.ts",
+      "node": "./dist/raw.cjs",
+      "require": "./dist/raw.cjs",
+      "import": "./dist/raw.mjs",
+      "browser": "./dist/raw.mjs",
+      "default": "./dist/raw.mjs"
+    }
   }
 }
