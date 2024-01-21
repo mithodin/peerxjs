@@ -18,7 +18,7 @@ export type { PeeRXJSMediaConnection } from './mediaConnection.js';
 
 function getPeer(
     id: undefined | string | PeerOptions,
-    config: undefined | PeerOptions
+    config: undefined | PeerOptions,
 ) {
     if (id) {
         if (typeof id === 'string') {
@@ -44,6 +44,7 @@ function setUpEventHandlers(peer: Peer, subject: Subject<PeeRXJSEvent>) {
         subject.next({
             type: PeeRXJSEventType.CONNECTION,
             connection: dataConnection(connection),
+            peerId: connection.peer,
         });
     });
     peer.on('call', (call) => {
@@ -54,6 +55,7 @@ function setUpEventHandlers(peer: Peer, subject: Subject<PeeRXJSEvent>) {
                 call.answer(stream);
                 return connection;
             },
+            peerId: call.peer,
         });
     });
     peer.on('disconnected', () => {
@@ -79,13 +81,14 @@ function doWhenOpen(peer: Peer, callback: () => void) {
 function connectTo(
     peer: Peer,
     command: ConnectCommand,
-    subject: Subject<PeeRXJSEvent>
+    subject: Subject<PeeRXJSEvent>,
 ) {
     doWhenOpen(peer, () => {
         const connection = peer.connect(command.peerId, command.options);
         subject.next({
             type: PeeRXJSEventType.CONNECTION,
             connection: dataConnection(connection),
+            peerId: command.peerId,
         });
     });
 }
@@ -93,16 +96,17 @@ function connectTo(
 function callPeer(
     peer: Peer,
     command: CallCommand,
-    subject: Subject<PeeRXJSEvent>
+    subject: Subject<PeeRXJSEvent>,
 ) {
     doWhenOpen(peer, () => {
         subject.next({
             type: PeeRXJSEventType.CALL,
             answer: (stream) => {
                 return mediaConnection(
-                    peer.call(command.peerId, stream, command.options)
+                    peer.call(command.peerId, stream, command.options),
                 );
             },
+            peerId: command.peerId,
         });
     });
 }
@@ -111,7 +115,7 @@ export function register(id?: string, config?: PeerOptions): PeeRXJSRaw;
 export function register(config: PeerOptions): PeeRXJSRaw;
 export function register(
     id?: string | PeerOptions,
-    config?: PeerOptions
+    config?: PeerOptions,
 ): PeeRXJSRaw {
     const subject = new Subject<PeeRXJSEvent>();
     const peer = getPeer(id, config);
@@ -134,6 +138,6 @@ export function register(
                 peer.destroy();
             },
         },
-        subject.asObservable()
+        subject.asObservable(),
     );
 }

@@ -128,7 +128,7 @@ describe('raw peerxjs', () => {
         const { Peer: MockPeerJs } = await getMockedPeerJsClass();
         MockPeerJs.instance?.emit('close');
         await expect(shouldClose).resolves.toEqual(
-            expect.objectContaining({ kind: 'C' })
+            expect.objectContaining({ kind: 'C' }),
         );
 
         expect(MockPeerJs.instance?.destroy).toHaveBeenCalled();
@@ -143,7 +143,7 @@ describe('raw peerxjs', () => {
             'mock-peer-id',
             {
                 label: 'my-label',
-            }
+            },
         );
     });
 
@@ -153,13 +153,14 @@ describe('raw peerxjs', () => {
         (MockPeerJs.instance as any).open = true;
         const shouldConnect = firstValueFrom(
             peerxjs.pipe(
-                filter(({ type }) => type === PeeRXJSEventType.CONNECTION)
-            )
+                filter(({ type }) => type === PeeRXJSEventType.CONNECTION),
+            ),
         );
         peerxjs.next(connect('mock-peer-id', { label: 'my-label' }));
         await expect(shouldConnect).resolves.toEqual({
             type: 'connection',
             connection: expect.anything(),
+            peerId: 'mock-peer-id',
         });
     });
 
@@ -168,12 +169,13 @@ describe('raw peerxjs', () => {
         const { Peer: MockPeerJs } = await getMockedPeerJsClass();
         (MockPeerJs.instance as any).open = true;
         const shouldCall = firstValueFrom(
-            peerxjs.pipe(filter(({ type }) => type === PeeRXJSEventType.CALL))
+            peerxjs.pipe(filter(({ type }) => type === PeeRXJSEventType.CALL)),
         );
         peerxjs.next(call('mock-peer-id', { metadata: 'my-label' }));
         await expect(shouldCall).resolves.toEqual({
             type: 'call',
             answer: expect.any(Function),
+            peerId: 'mock-peer-id',
         });
     });
 

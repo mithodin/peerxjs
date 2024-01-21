@@ -18,10 +18,12 @@ export type OpenEvent = PeeRXJSEventBase<PeeRXJSEventType.OPEN> & {
 
 export type ConnectionEvent = PeeRXJSEventBase<PeeRXJSEventType.CONNECTION> & {
     connection: PeeRXJSDataConnection;
+    peerId: string;
 };
 
 export type CallEvent = PeeRXJSEventBase<PeeRXJSEventType.CALL> & {
     answer: (stream: MediaStream) => PeeRXJSMediaConnection;
+    peerId: string;
 };
 
 export type DisconnectedEvent =
